@@ -129,10 +129,11 @@ gulp.task('build-dts', function(){
     .pipe(gulp.dest(paths.output));
 });
 
-gulp.task('fixup-dts', function(){
+gulp.task('concat-dts', function(){
   var importsToAdd = [];
+
   return gulp.src([paths.output + '**/*.d.ts', '!' + paths.output + 'index.d.ts'])
-  .pipe(through2.obj(function(file, enc, callback) {
+    .pipe(through2.obj(function(file, enc, callback) {
       file.contents = new Buffer(tools.extractImports(file.contents.toString('utf8'), importsToAdd));
       this.push(file);
       return callback();
@@ -163,8 +164,8 @@ gulp.task('build', function(callback) {
     'build-index',
     compileToModules
       .map(function(moduleType) { return 'build-babel-' + moduleType })
-      .concat(['build-dts']),
-   'fixup-dts',
+    .concat(paths.useTypeScriptForDTS ? ['build-dts'] : []),
+   'concat-dts',
    'clean-dts',
     callback
   );

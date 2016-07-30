@@ -2,18 +2,17 @@ var path = require('path');
 var fs = require('fs');
 var assign = Object.assign || require('object.assign');
 
-var userPath;
+var userPath = {};
 try {
-	userPath = require('../paths');
+	userPath = require('../../../spoonx').path;
 } catch(_) {
-	console.info('No user paths.js found.')
+	console.info('No user paths.js found.', _)
 }
 
-// hide warning //
-var emitter = require('events');
-emitter.defaultMaxListeners = 5;
+// hide excessive warning //
+require('events').defaultMaxListeners = 10;
 
-var appRoot = '../src/';
+var appRoot = userPath.root || 'src/';
 var pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
 
 var paths = {
@@ -29,21 +28,29 @@ var paths = {
   packageName: pkg.name,
   ignore: [],
   useTypeScriptForDTS: false,
-  importsToAdd: [],           	// eg. non-concated local imports in the main file as
-								// they will get removed during the build process
-  importsToIgnoreForDts: [], 	// imports that are only used internally.
-								// no need to d.ts export them
-  jsResources: [appRoot + 'components/'], // js to be transpiled, but not be concated 
-										  // and keeping their relative path
+  
+  // eg. non-concated local imports (aka start with ./) in the main file as 
+  // they will get removed during the build process
+  importsToAdd: [],           	
+  
+  // imports that are only used internally. no need to export them in the d.ts
+  importsToIgnoreForDts: [], 
+  
+  // js to be transpiled, but not be concated and keeping their relative path
+  jsResources: [appRoot + 'components/'], 
+  
+  // other resources that are just copied over and keeeping their relative path
   resources: appRoot + '{**/*.css,**/*.html}',
+  
   sort: true,
   concat: true
 };
 
+assign(paths, userPath);
+
+
+
 // files to be transpiled (and concated if selected)
 paths.mainSource = [paths.source].concat(paths.jsResources.map(function(resource) {return '!' + resource;}));
-
-// files to be linted
-paths.lintSource = paths.source;
 
 module.exports = paths;

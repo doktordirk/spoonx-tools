@@ -30,7 +30,7 @@ gulp.task('tdd',  function(done) {
   server.start(function() {
     var karmaServer = new KarmaServer({
       configFile: __dirname + '/../../karma.conf.js',
-      singleRun: false,
+      singleRun: args.once || false,
       browsers: [args.browser || 'Chrome']
     }, function(exitCode) {
       server.stop(function() {
@@ -43,24 +43,3 @@ gulp.task('tdd',  function(done) {
     karmaServer.start();
   });
 });
-
-/**
- * Run test once and exit
- */
- gulp.task('test-once', function(done) {
-   server.start(function() {
-     var karmaServer = new KarmaServer({
-       configFile: __dirname + '/../../karma.conf.js',
-       singleRun: true,
-       browsers: [args.browser || 'Chrome']
-     }, function(exitCode) {
-       server.stop(function() {
-         done();
-
-         process.exit(exitCode);
-       });
-     });
-
-     karmaServer.start();
-   });
- });

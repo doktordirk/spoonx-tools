@@ -4,9 +4,9 @@ var assign = Object.assign || require('object.assign');
 
 var userPath = {};
 try {
-	userPath = require('../../../spoonx').path;
+  userPath = require('../../../spoonx').path;
 } catch(_) {
-	console.info('No user paths.js found.', _)
+  console.info('No user path settings found.')
 }
 
 // hide excessive warning //
@@ -28,27 +28,26 @@ var paths = {
   packageName: pkg.name,
   ignore: [],
   useTypeScriptForDTS: false,
-  
-  // eg. non-concated local imports (aka start with ./) in the main file as 
+
+  // eg. non-concated local imports (aka start with ./) in the main file as
   // they will get removed during the build process
-  importsToAdd: [],           	
-  
+  importsToAdd: [],
+
   // imports that are only used internally. no need to export them in the d.ts
-  importsToIgnoreForDts: [], 
-  
+  importsToIgnoreForDts: [],
+
   // js to be transpiled, but not be concated and keeping their relative path
-  jsResources: [appRoot + 'components/'], 
-  
+  jsResources: [appRoot + 'components/'],
+
   // other resources that are just copied over and keeeping their relative path
   resources: appRoot + '{**/*.css,**/*.html}',
-  
+
   sort: true,
   concat: true
 };
 
+// merge settings
 assign(paths, userPath);
-
-
 
 // files to be transpiled (and concated if selected)
 paths.mainSource = [paths.source].concat(paths.jsResources.map(function(resource) {return '!' + resource;}));
